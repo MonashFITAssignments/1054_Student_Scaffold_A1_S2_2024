@@ -21,10 +21,10 @@ if __name__ == "__main__":
 
     while args.task == '':
         try:
-            task = input("Enter task [1 - 4], leave blank to run all tests: ")
+            task = input("Enter task [1 - 5], leave blank to run all tests: ")
             if task == '':
                 break
-            if 1 <= int(task) <= 4:
+            if 1 <= int(task) <= 5:
                 args.task = int(task)
         except ValueError:
             pass

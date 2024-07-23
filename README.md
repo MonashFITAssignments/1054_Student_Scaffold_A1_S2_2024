@@ -55,8 +55,8 @@ You must also modify file `player.py` to implement the `Player` class with the f
 - `hand` - a ordered collection of `Card` objects representing the cards in the player's hand. This list must be ordered by color of the card, then by card label in an increasing order according to the enum values. If the card has the same color and label, then consider the first card added to the hand to be the one with the lower index.
 - `add_card(self, card: Card)` - a method that takes a `Card` object as an argument and adds it to the hand. The method should return `None`. Assume that the card being passed is a valid card.
 - `play_card(self, index: int)` - a method that takes an integer as an argument and removes the card at the given index from the player's hand. The method should return the card that was removed from the player's hand.
-- `len(self)` - a method that returns the number of cards in the player's hand.
-- `getitem(self, index: int)` - a method that takes an integer as an argument and returns the card at the given index in the player's hand.
+- `__len__(self)` - a method that returns the number of cards in the player's hand.
+- `__getitem__(self, index: int)` - a method that takes an integer as an argument and returns the card at the given index in the player's hand.
 
 **NOTE - For both of these classes, please add additional helper methods if you think they are necessary (including a `__str__` method to help with debugging).**
 
@@ -133,3 +133,68 @@ You must now implement the `play_game` method in the `Game` class. The `play_gam
         - Add the stored card back to the top of the discard pile.
     - Similarly, if a player plays a draw four card, the next player must draw four cards from the Draw Pile and cannot play either of them. The turn then moves to the next player. For example - if Bob plays Draw 4 and Charlie is the next player, Charlie must draw 4 cards from the `draw_pile` and cannot play either of them. Charlie's turn is then skipped.
     - If a player plays a CRAZY card, the player gets to choose the color to continue play. In our version of the game, we will be choosing a color using the given RandomGen class using the following code: `CardColor(RandomGen.randint(0,3))` where `RandomGen` is an instance of the `RandomGen` class and `CardColor` is an enum class representing the colors of the cards. The next player can play any card of that color or a CRAZY card.
+
+## Task 5 (FIT1054 Only) - Implement the GameStats class
+
+In the file `game_stats.py`, you must implement the `GameStats` class. The `GameStats` class should have the following attributes:
+
+- `__init__(self, players: ArrayR)` - The constructor of the class. This method takes an ArrayR of Player objects as an argument and should be used to set up the instance variable mentioned below.
+
+- `stats` - A table structure that has the players as the rows and the following columns (in order):
+    - `player_name` - The name of the player.
+    - `games_played` - The total number of games played by the player.
+    - `turns_taken` - The total number of turns taken by the player.
+    - `cards_played` - The total number of cards played by the player.
+    - `cards_drawn` - The total number of cards drawn by the player. (This does NOT include the cards given at the start of the game)
+    - `cards_left` - The total number of cards left in the player's hand at the end of the game.
+    - `wins` - The number of games won by the player.
+
+- `players` - A collection of Player objects that exist in the statistics. This collection should be the same as the one passed to the constructor while initialising the object. A player should be added to this collection only if they are not already in the collection when being passed to the `add_player` method.
+
+**NOTE** - This means if there are 3 players, the table should have 3 rows and 7 columns (mentioned above). Also, except the `player_name` column, all other columns should be initialised to 0. Another thing to note is that the total number of distinct players will NEVER exceed the MAX_PLAYERS constant.
+
+The class should also have the following methods defined:
+
+- `add_player(self, player: Player)` - This method adds a new non-existant player to the `stats` table. The method should return `None`. This method should also initialise the player's statistics to 0.
+
+- `record_game_played(self, player: Player)` - This method adds 1 to the `games_played` attribute of the player passed as an argument. The method should return `None`.
+
+- `record_turn(self, player: Player)` - This method adds 1 to the `turns_taken` attribute of the player passed as an argument. The method should return `None`.
+
+- `record_card_played(self, player: Player)` - This method adds 1 to the `cards_played` attribute of the player passed as an argument. The method should return `None`.
+
+- `record_card_drawn(self, player: Player)` - This method adds 1 to the `cards_drawn` attribute of the player passed as an argument. The method should return `None`.
+
+- `record_game_won(self, player: Player)` - This method adds 1 to the `wins` attribute of the player passed as an argument. The method should return `None`.
+
+- `record_cards_left(self, player: Player)` - This method adds the number of cards left in the player's hand to the `cards_left` attribute of the player passed as an argument. The method should return `None`.
+
+- `sort_stats(self, stat: StatsColumn, ascending=True)` - This method sorts the `stats` table by the column passed as an argument. The method should return `None`. You can assume that the value for `stat` will be a valid value from the `StatsColumn` enum class.
+
+You can also assume that the order of the columns will not change. The sorting should be done in the order passed to the `ascending` argument. If `ascending` is `True`, the sorting should be done in an increasing order. If `ascending` is `False`, the sorting should be done in a decreasing order. Keep your sorting stable. This means that if two players have the same value in the column being sorted, the order of these players should not change.
+
+- `__len__(self)` - This method returns the number of players in the `stats` table.
+
+- `__str__(self)` - This method generates a report of the game statistics. The report should be a string in a tabular form that contains the following information:
+    - The total number of games played.
+    - The total number of turns taken.
+    - The total number of cards played.
+    - The total number of cards drawn.
+    - The total number of cards left in the players' hands.
+    - The total number of games won by each player.
+
+Here is an example output of the `__str__` method:
+
+```
+Name    Games Played    Turns Taken     Cards Played    Cards Drawn     Cards Left      Games Won
+Alice           1               2               1               3               4               0
+Bob             1               2               1               1               2               0
+Charlie         1               2               0               2               4               0
+David           1               2               2               0               0               1
+```
+
+You will then need to edit your version of the `Game` class to account for the new `GameStats` class. You should do this by doing the following:
+
+- Add a new attribute to the `Game` class called `game_stats` that is an instance of the `GameStats` class. This attribute should be initialised in the `initialise_game` method when this method is called the first time on the game object. Since the values of all the stats are 0 when initialised, you should set all of these values to 0 in the `initialise_game` method. If the `initialise_game` method is called multiple times, the `game_stats` attribute should not be reset to 0.
+
+- Update the `play_game` method to record the appropriate statistics in the `game_stats` object. You should record the statistics mentioned above.
