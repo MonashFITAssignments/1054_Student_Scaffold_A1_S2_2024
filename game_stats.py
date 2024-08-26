@@ -1,10 +1,10 @@
 from data_structures.referential_array import ArrayR
 from player import Player
 from constants import Constants
-from enum import Enum, auto
+from enum import IntEnum, auto
 
 
-class StatsColumn(Enum):
+class StatsColumn(IntEnum):
     """
     StatsColumn class to store the columns of the statistics
     """
